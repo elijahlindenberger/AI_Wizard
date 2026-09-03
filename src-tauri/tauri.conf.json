@@ -4,11 +4,11 @@
   "version": "0.1.0",
   "identifier": "com.elijahl.wizard",
   "build": {
-    "beforeDevCommand": "npm run dev",
-    "devUrl": "http://localhost:1420",
-    "beforeBuildCommand": "npm run build",
-    "frontendDist": "../dist"
-  },
+  "beforeDevCommand": "npm run dev",
+  "beforeBuildCommand": "npm run build",
+  "devUrl": "http://localhost:5173/AI_Wizard/",
+  "frontendDist": "../dist"
+},
   "app": {
     "windows": [
       {

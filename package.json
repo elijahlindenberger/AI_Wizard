@@ -27,5 +27,10 @@
     "tailwindcss": "^4.3.3",
     "typescript": "~5.8.3",
     "vite": "^7.0.4"
+  },
+  "allowScripts": {
+    "@google/genai@2.20.0": true,
+    "esbuild@0.28.2": true,
+    "protobufjs@7.6.6": true
   }
 }

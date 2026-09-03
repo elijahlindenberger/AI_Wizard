@@ -1,7 +1,13 @@
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
 
 export default defineConfig({
   plugins: [react()],
-  base: '/AI_Wizard/', // Replace with your exact repository name
+  // Prevent Vite from watching Rust build files
+  server: {
+    port: 5173,
+    watch: {
+      ignored: ["**/src-tauri/**"],
+    },
+  },
 });
