@@ -18,7 +18,7 @@ const TypewriterText: React.FC<TypewriterProps> = ({ text, isLatest }) => {
       return;
     }
 
-    // Only switch avatar to 'speaking' once response text actually starts arriving
+    // Switch avatar state to speaking while typing text
     if (text.length > 0 && indexRef.current < text.length) {
       setAvatarState('speaking');
     }
@@ -33,7 +33,7 @@ const TypewriterText: React.FC<TypewriterProps> = ({ text, isLatest }) => {
           soundFX.playBlip();
         }
       } else if (text.length > 0 && indexRef.current >= text.length) {
-        // Return to idle state when typing finishes
+        // Return to idle state when dialogue finishes typing
         setAvatarState('idle');
       }
     }, 18);
@@ -53,33 +53,38 @@ export const JRPGDialogue = () => {
   }, [messages]);
 
   return (
-    <div className="snes-box h-full p-4 overflow-y-auto flex flex-col gap-3 font-mono text-base leading-relaxed text-white">
-      {messages.length === 0 ? (
-        <p className="text-gray-400 italic">► Greetings Elijah. The wizard awaits your prompt.</p>
-      ) : (
-        messages.map((msg, index) => {
-          const isLatestWizard = msg.sender === 'gemini' && index === messages.length - 1;
-          return (
-            <div key={index} className="flex gap-2">
-              <span
-                className={
-                  msg.sender === 'user' ? 'text-yellow-400 font-bold shrink-0' : 'text-cyan-400 font-bold shrink-0'
-                }
-              >
-                {msg.sender === 'user' ? 'HERO:' : 'WIZARD:'}
-              </span>
-              <span className="text-gray-100">
-                {msg.sender === 'gemini' ? (
-                  <TypewriterText text={msg.text} isLatest={isLatestWizard} />
-                ) : (
-                  msg.text
-                )}
-              </span>
-            </div>
-          );
-        })
-      )}
-      <div ref={bottomRef} />
+    <div className="snes-box w-full h-full p-3 flex flex-col overflow-hidden">
+      <div className="flex-1 overflow-y-auto snes-scroll pr-1 flex flex-col gap-2 font-mono text-xs leading-relaxed text-white">
+        {messages.length === 0 ? (
+          <p className="text-gray-300">
+            <span className="text-yellow-300 font-bold mr-1">▶</span>
+            Greetings Elijah. The wizard awaits your prompt.
+          </p>
+        ) : (
+          messages.map((msg, index) => {
+            const isLatestWizard = msg.sender === 'gemini' && index === messages.length - 1;
+            return (
+              <div key={index} className="flex gap-1.5">
+                <span
+                  className={
+                    msg.sender === 'user' ? 'text-cyan-300 font-bold shrink-0' : 'text-yellow-300 font-bold shrink-0'
+                  }
+                >
+                  {msg.sender === 'user' ? 'HERO:' : 'WIZARD:'}
+                </span>
+                <span className="text-white">
+                  {msg.sender === 'gemini' ? (
+                    <TypewriterText text={msg.text} isLatest={isLatestWizard} />
+                  ) : (
+                    msg.text
+                  )}
+                </span>
+              </div>
+            );
+          })
+        )}
+        <div ref={bottomRef} />
+      </div>
     </div>
   );
 };
