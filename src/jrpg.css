@@ -1,0 +1,24 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+.snes-box {
+  background: linear-gradient(180deg, #0000aa 0%, #000033 100%);
+  border: 4px solid #ffffff;
+  outline: 4px solid #000000;
+  box-shadow: inset 0 0 0 2px #888888;
+  font-family: 'Press Start 2P', monospace;
+  image-rendering: pixelated;
+}
+
+.pixel-art {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+.snes-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+.snes-scroll::-webkit-scrollbar-thumb {
+  background: #ffffff;
+  border: 2px solid #000000;
+}
