@@ -8,6 +8,22 @@
   box-shadow: inset 0 0 0 2px #888888;
   font-family: 'Press Start 2P', monospace;
   image-rendering: pixelated;
+  color: #ffffff; /* Guarantees high-contrast white text */
+}
+
+/* Force all buttons, inputs, text, and nested tags inside snes-box to render white */
+.snes-box *,
+.snes-box input,
+.snes-box button,
+.snes-box textarea {
+  color: #ffffff;
+  font-family: 'Press Start 2P', monospace;
+}
+
+/* Add drop shadows to paragraph text for classic SNES readability */
+.snes-box p,
+.snes-box span {
+  text-shadow: 1px 1px 0px #000000;
 }
 
 .pixel-art {
