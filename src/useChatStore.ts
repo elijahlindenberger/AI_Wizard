@@ -115,7 +115,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
           parts: [{ text: m.text }],
         }));
         const responseStream = await ai.models.generateContentStream({
-          model: 'gemini-2.5-flash',
+          model: 'gemini-3.6-flash',
           contents,
           config: { systemInstruction: 'You are Merlin, a wise pixel-art wizard assistant. Keep responses concise (under 3 sentences).' },
         });
@@ -151,7 +151,6 @@ export const useChatStore = create<ChatStore>((set, get) => ({
           }),
         });
 
-        // Ensure HTTP status errors (401, 429, 500) trigger catch block
         if (!res.ok) {
           const errData = await res.json().catch(() => ({}));
           throw new Error(errData.error?.message || `HTTP ${res.status} Error`);
@@ -199,7 +198,6 @@ export const useChatStore = create<ChatStore>((set, get) => ({
         });
       }
 
-      // Reset avatar animation state back to idle after response finishes
       set({ avatarState: 'idle' });
 
     } catch (err: any) {
