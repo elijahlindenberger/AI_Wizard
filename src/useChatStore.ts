@@ -41,6 +41,23 @@ const loadSavedKeys = (): Record<LLMProvider, string> => {
   }
 };
 
+// Formats API errors into clean JRPG text rather than raw JSON dumps
+const formatErrorMessage = (err: any): string => {
+  const raw = err?.message || err;
+  if (typeof raw === 'string') {
+    if (raw.includes('503') || raw.includes('high demand')) {
+      return 'The ethereal mana stream is surging with traffic (503 High Demand). Please recast your spell in a moment!';
+    }
+    try {
+      const parsed = JSON.parse(raw);
+      if (parsed?.error?.message) return formatErrorMessage(parsed.error);
+    } catch {
+      // Return unparsed string
+    }
+  }
+  return raw || 'A mysterious magical distortion occurred.';
+};
+
 let ai: GoogleGenAI | null = null;
 
 export const useChatStore = create<ChatStore>((set, get) => ({
@@ -57,12 +74,12 @@ export const useChatStore = create<ChatStore>((set, get) => ({
 
   selectedProvider: 'gemini',
   setSelectedProvider: (provider) => {
-    ai = null; // Clear active client instance on provider switch
+    ai = null;
     set({ selectedProvider: provider });
   },
   apiKeys: loadSavedKeys(),
   setApiKey: (provider, key) => {
-    if (provider === 'gemini') ai = null; // Clear client instance when key is modified
+    if (provider === 'gemini') ai = null;
     const updated = { ...get().apiKeys, [provider]: key };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
     set({ apiKeys: updated });
@@ -77,12 +94,11 @@ export const useChatStore = create<ChatStore>((set, get) => ({
 
   sendMessage: async (prompt: string) => {
     const { selectedProvider, apiKeys } = get();
-    // Fall back to VITE env key if local key isn't entered for Gemini
     const key = apiKeys[selectedProvider] || (selectedProvider === 'gemini' ? import.meta.env.VITE_GEMINI_API_KEY : '');
 
     if (!key) {
       soundFX.playFizzle();
-      set({ isSettingsOpen: true }); // Automatically open settings if key is missing
+      set({ isSettingsOpen: true });
       set((state) => ({
         messages: [
           ...state.messages,
@@ -107,13 +123,13 @@ export const useChatStore = create<ChatStore>((set, get) => ({
     try {
       let fullText = '';
 
-      // --- Provider Routing ---
       if (selectedProvider === 'gemini') {
         if (!ai) ai = new GoogleGenAI({ apiKey: key });
         const contents = updatedMessages.slice(0, -1).map((m) => ({
           role: m.sender === 'user' ? 'user' : 'model',
           parts: [{ text: m.text }],
         }));
+
         const responseStream = await ai.models.generateContentStream({
           model: 'gemini-3.6-flash',
           contents,
@@ -203,9 +219,10 @@ export const useChatStore = create<ChatStore>((set, get) => ({
     } catch (err: any) {
       console.error('LLM API Error:', err);
       soundFX.playFizzle();
+      const cleanError = formatErrorMessage(err);
       set((state) => {
         const newMsgs = [...state.messages];
-        newMsgs[newMsgs.length - 1] = { sender: 'gemini', text: `Spell failed: ${err.message || 'Check API key or network connection.'}` };
+        newMsgs[newMsgs.length - 1] = { sender: 'gemini', text: `[SPELL FIZZLED] ${cleanError}` };
         return { messages: newMsgs, avatarState: 'idle' };
       });
     }
