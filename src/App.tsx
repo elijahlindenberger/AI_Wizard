@@ -3,24 +3,18 @@ import { TitleBar } from './TitleBar';
 import { WizardCanvas } from './WizardCanvas';
 import { JRPGDialogue } from './JRPGDialogue';
 import { JRPGCommandBar } from './JRPGCommandBar';
-import { VolumeSlider } from './VolumeSlider';
-import { HotkeySettings } from './HotkeySettings';
-import { QuitButton } from './QuitButton';
 import { SettingsModal } from './SettingsModal';
-import { useChatStore } from './useChatStore';
 import './jrpg.css';
 
 export default function App() {
-  const avatarState = useChatStore((state) => state.avatarState);
-
   return (
     <div className="min-h-screen w-full bg-slate-950 flex items-center justify-center p-2 sm:p-4 text-white">
       <div className="snes-app-container flex flex-col p-2 gap-2 select-none overflow-hidden bg-black border-2 border-slate-800 shadow-2xl rounded-sm">
-        {/* Row 1: Header Bar */}
+        {/* Header Bar */}
         <TitleBar />
 
-        {/* Row 2: Wizard Animation (Left) + JRPG Dialogue Text Box (Right) */}
-        <div className="flex gap-2 h-44 sm:h-48 shrink-0">
+        {/* Main Interface: Wizard Portrait (Left) + JRPG Dialogue Box (Right) */}
+        <div className="flex gap-2 flex-1 min-h-0 overflow-hidden">
           <div className="snes-box w-40 sm:w-48 shrink-0 p-2 flex items-center justify-center overflow-hidden bg-black">
             <WizardCanvas />
           </div>
@@ -29,20 +23,7 @@ export default function App() {
           </div>
         </div>
 
-        {/* Row 3: Status Details & Controls */}
-        <div className="snes-box flex-1 min-h-0 p-3 flex flex-col justify-between overflow-y-auto">
-          <div>
-            <div className="flex justify-between items-center mb-1">
-              <span className="text-yellow-300 font-bold tracking-wider text-xs">MERLIN STATUS</span>
-              <QuitButton />
-            </div>
-            <p className="text-gray-200 text-xs">STATE: {avatarState.toUpperCase()}</p>
-          </div>
-          <HotkeySettings />
-          <VolumeSlider />
-        </div>
-
-        {/* Row 4: Command Input Bar */}
+        {/* Bottom Command Input Bar */}
         <div className="shrink-0">
           <JRPGCommandBar />
         </div>
