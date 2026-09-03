@@ -70,10 +70,10 @@ export const SettingsModal = () => {
                     soundFX.playSelect();
                     setSelectedProvider(provider);
                   }}
-                  className={`p-2.5 uppercase border text-center transition-all cursor-pointer font-bold ${
+                  className={`p-2.5 uppercase border text-center transition-all cursor-pointer font-bold text-[10px] sm:text-xs block ${
                     isSelected
                       ? 'bg-blue-900 border-white text-white shadow-md'
-                      : 'bg-slate-950/80 border-slate-700 text-gray-500 hover:text-gray-300 hover:border-slate-500'
+                      : 'bg-black/60 border-slate-700 text-slate-500 hover:text-slate-300 hover:border-slate-500'
                   }`}
                 >
                   {PROVIDER_LABELS[provider]}

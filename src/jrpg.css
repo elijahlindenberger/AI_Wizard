@@ -1,7 +1,6 @@
 @import "tailwindcss";
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
-/* Dynamic Viewport Height prevents soft-keyboard layout squeezing */
 .snes-app-container {
   width: 100%;
   max-width: 800px;
@@ -16,14 +15,13 @@
   box-shadow: inset 0 0 0 2px #888888;
   font-family: 'Press Start 2P', monospace;
   image-rendering: pixelated;
-  color: #ffffff !important;
+  color: #ffffff;
 }
 
-.snes-box *,
+/* Removed the !important override so Tailwind text colors work */
 .snes-box input,
 .snes-box button,
 .snes-box textarea {
-  color: #ffffff !important;
   font-family: 'Press Start 2P', monospace;
 }
 
