@@ -1,41 +1,57 @@
 import React, { useState } from 'react';
 import { useChatStore } from './useChatStore';
+import { soundFX } from './audio';
 
 export const JRPGCommandBar = () => {
   const [input, setInput] = useState('');
   const sendMessage = useChatStore((state) => state.sendMessage);
   const clearSession = useChatStore((state) => state.clearSession);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleCast = () => {
     if (!input.trim()) return;
     sendMessage(input.trim());
     setInput('');
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleCast();
+    }
+  };
+
+  const handleClear = () => {
+    soundFX.playFizzle();
+    clearSession();
+    setInput('');
+  };
+
   return (
-    <form onSubmit={handleSubmit} className="snes-box p-2 flex gap-2 items-center">
-      <span className="text-yellow-400 text-sm pl-2">►</span>
+    <div className="snes-box p-2 flex items-center gap-2">
+      <span className="text-yellow-300 font-bold text-xs select-none pl-1">▶</span>
       <input
         type="text"
         value={input}
         onChange={(e) => setInput(e.target.value)}
+        onKeyDown={handleKeyDown}
         placeholder="TYPE COMMAND..."
-        className="flex-1 bg-transparent text-yellow-200 placeholder-blue-400 focus:outline-none font-mono text-base px-2"
+        className="flex-1 bg-transparent text-white text-xs md:text-sm font-mono focus:outline-none placeholder-gray-500 pr-2"
       />
-      <button
-        type="button"
-        onClick={clearSession}
-        className="px-3 py-1 bg-red-950 hover:bg-red-800 text-red-300 border border-red-600 font-mono text-xs font-bold rounded"
-      >
-        [OBLIVIATE]
-      </button>
-      <button
-        type="submit"
-        className="px-4 py-1 bg-blue-900 hover:bg-blue-700 text-yellow-300 border border-yellow-400 font-mono text-xs font-bold rounded"
-      >
-        [CAST]
-      </button>
-    </form>
+      
+      {/* Separated action buttons with clear gap spacing */}
+      <div className="flex items-center gap-3 shrink-0">
+        <button
+          onClick={handleClear}
+          className="px-2.5 py-1 bg-red-900 hover:bg-red-800 text-white text-xs font-bold border border-white cursor-pointer active:translate-y-0.5"
+        >
+          [OBLIVIATE]
+        </button>
+        <button
+          onClick={handleCast}
+          className="px-3 py-1 bg-yellow-600 hover:bg-yellow-500 text-black font-bold text-xs border border-white cursor-pointer active:translate-y-0.5"
+        >
+          [CAST]
+        </button>
+      </div>
+    </div>
   );
 };
