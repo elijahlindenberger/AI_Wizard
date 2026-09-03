@@ -56,14 +56,19 @@ export const useChatStore = create<ChatStore>((set, get) => ({
   },
 
   selectedProvider: 'gemini',
-  setSelectedProvider: (provider) => set({ selectedProvider: provider }),
+  setSelectedProvider: (provider) => {
+    ai = null; // Clear active client instance on provider switch
+    set({ selectedProvider: provider });
+  },
   apiKeys: loadSavedKeys(),
   setApiKey: (provider, key) => {
+    if (provider === 'gemini') ai = null; // Clear client instance when key is modified
     const updated = { ...get().apiKeys, [provider]: key };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
     set({ apiKeys: updated });
   },
   purgeApiKeys: () => {
+    ai = null;
     localStorage.removeItem(STORAGE_KEY);
     set({ apiKeys: { gemini: '', openai: '', claude: '', grok: '' } });
   },
@@ -110,14 +115,17 @@ export const useChatStore = create<ChatStore>((set, get) => ({
           parts: [{ text: m.text }],
         }));
         const responseStream = await ai.models.generateContentStream({
-          model: 'gemini-3.6-flash',
+          model: 'gemini-2.5-flash',
           contents,
           config: { systemInstruction: 'You are Merlin, a wise pixel-art wizard assistant. Keep responses concise (under 3 sentences).' },
         });
 
+        set({ avatarState: 'speaking' });
+
         for await (const chunk of responseStream) {
           if (chunk.text) {
             fullText += chunk.text;
+            soundFX.playTextBeep();
             set((state) => {
               const newMsgs = [...state.messages];
               newMsgs[newMsgs.length - 1] = { sender: 'gemini', text: fullText };
@@ -142,12 +150,21 @@ export const useChatStore = create<ChatStore>((set, get) => ({
             ],
           }),
         });
+
+        // Ensure HTTP status errors (401, 429, 500) trigger catch block
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.error?.message || `HTTP ${res.status} Error`);
+        }
+
         const data = await res.json();
         fullText = data.choices?.[0]?.message?.content || 'Spell failed.';
+        soundFX.playTextBeep();
+
         set((state) => {
           const newMsgs = [...state.messages];
           newMsgs[newMsgs.length - 1] = { sender: 'gemini', text: fullText };
-          return { messages: newMsgs };
+          return { messages: newMsgs, avatarState: 'speaking' };
         });
       } else if (selectedProvider === 'claude') {
         const res = await fetch('https://api.anthropic.com/v1/messages', {
@@ -165,14 +182,26 @@ export const useChatStore = create<ChatStore>((set, get) => ({
             messages: updatedMessages.slice(0, -1).map((m) => ({ role: m.sender === 'user' ? 'user' : 'assistant', content: m.text })),
           }),
         });
+
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.error?.message || `HTTP ${res.status} Error`);
+        }
+
         const data = await res.json();
         fullText = data.content?.[0]?.text || 'Spell failed.';
+        soundFX.playTextBeep();
+
         set((state) => {
           const newMsgs = [...state.messages];
           newMsgs[newMsgs.length - 1] = { sender: 'gemini', text: fullText };
-          return { messages: newMsgs };
+          return { messages: newMsgs, avatarState: 'speaking' };
         });
       }
+
+      // Reset avatar animation state back to idle after response finishes
+      set({ avatarState: 'idle' });
+
     } catch (err: any) {
       console.error('LLM API Error:', err);
       soundFX.playFizzle();
