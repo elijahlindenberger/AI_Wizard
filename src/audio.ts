@@ -4,11 +4,14 @@ export class RetroAudioEngine {
   private volume: number = 0.3;
   private isMuted: boolean = false;
 
+  private castingGain: GainNode | null = null;
+  private castingOscs: OscillatorNode[] = [];
+  private castingLfo: OscillatorNode | null = null;
+
   constructor() {
     this.setupAutoplayUnlock();
   }
 
-  // Attaches one-time event listeners to resume suspended AudioContext on first user interaction
   private setupAutoplayUnlock() {
     const unlock = () => {
       if (!this.ctx) {
@@ -45,7 +48,6 @@ export class RetroAudioEngine {
     }
   }
 
-  // Volume & Mute API
   public getVolume(): number {
     return this.volume;
   }
@@ -73,7 +75,6 @@ export class RetroAudioEngine {
     return this.isMuted;
   }
 
-  // Retro JRPG Sound Effects
   public playTextBeep() {
     this.init();
     if (!this.ctx || !this.masterGain || this.isMuted || this.ctx.state !== 'running') return;
@@ -119,7 +120,6 @@ export class RetroAudioEngine {
     osc.stop(this.ctx.currentTime + 0.12);
   }
 
-  // Magical SNES Spell Casting Arpeggio (C5 -> E5 -> G5 -> B5 -> C6 -> E6)
   public playCast() {
     this.init();
     if (!this.ctx || !this.masterGain || this.isMuted || this.ctx.state !== 'running') return;
@@ -150,11 +150,81 @@ export class RetroAudioEngine {
     });
   }
 
+  // Continuous retro magical aura hum while prompt/streaming is active
+  public startCastingLoop() {
+    this.init();
+    if (!this.ctx || !this.masterGain || this.isMuted || this.ctx.state !== 'running') return;
+    if (this.castingGain) return;
+
+    const now = this.ctx.currentTime;
+    this.castingGain = this.ctx.createGain();
+
+    const osc1 = this.ctx.createOscillator();
+    const osc2 = this.ctx.createOscillator();
+    const lfo = this.ctx.createOscillator();
+    const filter = this.ctx.createBiquadFilter();
+
+    osc1.type = 'sawtooth';
+    osc2.type = 'triangle';
+
+    osc1.frequency.setValueAtTime(164.81, now);
+    osc2.frequency.setValueAtTime(165.81, now);
+
+    lfo.frequency.setValueAtTime(4, now);
+    const lfoGain = this.ctx.createGain();
+    lfoGain.gain.setValueAtTime(12, now);
+    lfo.connect(lfoGain);
+    lfoGain.connect(osc1.frequency);
+
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(350, now);
+
+    this.castingGain.gain.setValueAtTime(0.01, now);
+    this.castingGain.gain.linearRampToValueAtTime(0.06, now + 0.2);
+
+    osc1.connect(filter);
+    osc2.connect(filter);
+    filter.connect(this.castingGain);
+    this.castingGain.connect(this.masterGain);
+
+    lfo.start(now);
+    osc1.start(now);
+    osc2.start(now);
+
+    this.castingOscs = [osc1, osc2];
+    this.castingLfo = lfo;
+  }
+
+  public stopCastingLoop() {
+    if (!this.ctx || !this.castingGain) return;
+
+    const now = this.ctx.currentTime;
+    this.castingGain.gain.setValueAtTime(this.castingGain.gain.value, now);
+    this.castingGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.1);
+
+    const osstoStop = [...this.castingOscs];
+    const lfoToStop = this.castingLfo;
+
+    this.castingOscs = [];
+    this.castingLfo = null;
+    this.castingGain = null;
+
+    setTimeout(() => {
+      osstoStop.forEach((osc) => {
+        try { osc.stop(); } catch {}
+      });
+      if (lfoToStop) {
+        try { lfoToStop.stop(); } catch {}
+      }
+    }, 120);
+  }
+
   public playSpellCast() {
     this.playCast();
   }
 
   public playFizzle() {
+    this.stopCastingLoop();
     this.init();
     if (!this.ctx || !this.masterGain || this.isMuted || this.ctx.state !== 'running') return;
 

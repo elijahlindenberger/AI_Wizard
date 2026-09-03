@@ -13,8 +13,8 @@ export const JRPGCommandBar = () => {
       return;
     }
     
-    // Play spell casting chime SFX
     soundFX.playCast();
+    soundFX.startCastingLoop();
     sendMessage(input.trim());
     setInput('');
   };

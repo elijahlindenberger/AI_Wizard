@@ -37,8 +37,8 @@ const TypewriterText: React.FC<TypewriterProps> = ({ text, isLatest }) => {
             soundFX.playBlip();
           }
         } else if (currentText.length > 0 && indexRef.current >= currentText.length) {
-          // Finish typing current stream buffer and stop background ticks
           setAvatarState('idle');
+          soundFX.stopCastingLoop();
           if (timerRef.current !== null) {
             clearInterval(timerRef.current);
             timerRef.current = null;
