@@ -2,6 +2,13 @@ import React, { useEffect } from 'react';
 import { useChatStore, LLMProvider } from './useChatStore';
 import { soundFX } from './audio';
 
+const PROVIDER_LABELS: Record<LLMProvider, string> = {
+  gemini: 'GEMINI',
+  openai: 'OPEN AI',
+  claude: 'CLAUDE',
+  grok: 'GROK',
+};
+
 export const SettingsModal = () => {
   const isSettingsOpen = useChatStore((state) => state.isSettingsOpen);
   const setSettingsOpen = useChatStore((state) => state.setSettingsOpen);
@@ -11,7 +18,6 @@ export const SettingsModal = () => {
   const setApiKey = useChatStore((state) => state.setApiKey);
   const purgeApiKeys = useChatStore((state) => state.purgeApiKeys);
 
-  // Close modal when pressing the Escape key
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isSettingsOpen) {
@@ -31,17 +37,15 @@ export const SettingsModal = () => {
   };
 
   return (
-    // Dark Backdrop: Clicking outside the box closes the modal
     <div 
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
       onClick={handleClose}
     >
-      {/* Inner Box: stopPropagation prevents inner clicks from closing modal */}
       <div 
         className="snes-box w-full max-w-md p-4 flex flex-col gap-4 text-white relative shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header with Title and Close [X] Button */}
+        {/* Header */}
         <div className="flex justify-between items-center border-b-2 border-white pb-2">
           <span className="text-yellow-300 font-bold text-xs sm:text-sm tracking-wider">SPELLBOOK SETTINGS</span>
           <button
@@ -53,30 +57,33 @@ export const SettingsModal = () => {
           </button>
         </div>
 
-        {/* Provider Selection & API Keys */}
+        {/* Provider Selector Grid */}
         <div className="flex flex-col gap-3 text-xs">
           <label className="text-gray-300 font-bold">SELECT PROVIDER:</label>
-          <div className="grid grid-cols-2 gap-2">
-            {(['gemini', 'openai', 'claude', 'grok'] as LLMProvider[]).map((provider) => (
-              <button
-                key={provider}
-                onClick={() => {
-                  soundFX.playSelect();
-                  setSelectedProvider(provider);
-                }}
-                className={`p-2 uppercase border text-center transition-colors cursor-pointer ${
-                  selectedProvider === provider
-                    ? 'bg-yellow-500 text-black border-yellow-300 font-bold'
-                    : 'bg-slate-900 border-slate-700 hover:bg-slate-800'
-                }`}
-              >
-                {provider}
-              </button>
-            ))}
+          <div className="grid grid-cols-2 gap-3">
+            {(['gemini', 'openai', 'claude', 'grok'] as LLMProvider[]).map((provider) => {
+              const isSelected = selectedProvider === provider;
+              return (
+                <button
+                  key={provider}
+                  onClick={() => {
+                    soundFX.playSelect();
+                    setSelectedProvider(provider);
+                  }}
+                  className={`p-2.5 uppercase border text-center transition-all cursor-pointer font-bold ${
+                    isSelected
+                      ? 'bg-blue-900 border-white text-white shadow-md'
+                      : 'bg-slate-950/80 border-slate-700 text-gray-500 hover:text-gray-300 hover:border-slate-500'
+                  }`}
+                >
+                  {PROVIDER_LABELS[provider]}
+                </button>
+              );
+            })}
           </div>
 
           <label className="text-gray-300 font-bold mt-2">
-            {selectedProvider.toUpperCase()} API KEY:
+            {PROVIDER_LABELS[selectedProvider]} API KEY:
           </label>
           <input
             type="password"
