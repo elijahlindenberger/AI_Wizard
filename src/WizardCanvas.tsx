@@ -1,35 +1,38 @@
 import React, { useEffect, useRef } from 'react';
 import { useChatStore, AvatarAction, LLMProvider } from './useChatStore';
 
+// Helper to prepend Vite's base path for GitHub Pages compatibility
+const getAssetUrl = (path: string) => `${import.meta.env.BASE_URL}${path.replace(/^\//, '')}`;
+
 // Sprite sheets for each LLM provider across idle, speaking, and casting states
 const PROVIDER_SPRITE_MAPS: Record<LLMProvider, Record<AvatarAction, string>> = {
   gemini: {
-    idle: '/sprites/merlin_idle.png',
-    speaking: '/sprites/merlin_speaking.png',
-    thinking: '/sprites/merlin_casting.png',
-    casting: '/sprites/merlin_casting.png',
-    nodding: '/sprites/merlin_idle.png',
+    idle: 'sprites/merlin_idle.png',
+    speaking: 'sprites/merlin_speaking.png',
+    thinking: 'sprites/merlin_casting.png',
+    casting: 'sprites/merlin_casting.png',
+    nodding: 'sprites/merlin_idle.png',
   },
   openai: {
-    idle: '/sprites/openai_idle.png',
-    speaking: '/sprites/openai_speaking.png',
-    thinking: '/sprites/openai_casting.png',
-    casting: '/sprites/openai_casting.png',
-    nodding: '/sprites/openai_idle.png',
+    idle: 'sprites/openai_idle.png',
+    speaking: 'sprites/openai_speaking.png',
+    thinking: 'sprites/openai_casting.png',
+    casting: 'sprites/openai_casting.png',
+    nodding: 'sprites/openai_idle.png',
   },
   claude: {
-    idle: '/sprites/claude_idle.png',
-    speaking: '/sprites/claude_speaking.png',
-    thinking: '/sprites/claude_casting.png',
-    casting: '/sprites/claude_casting.png',
-    nodding: '/sprites/claude_idle.png',
+    idle: 'sprites/claude_idle.png',
+    speaking: 'sprites/claude_speaking.png',
+    thinking: 'sprites/claude_casting.png',
+    casting: 'sprites/claude_casting.png',
+    nodding: 'sprites/claude_idle.png',
   },
   grok: {
-    idle: '/sprites/grok_idle.png',
-    speaking: '/sprites/grok_speaking.png',
-    thinking: '/sprites/grok_casting.png',
-    casting: '/sprites/grok_casting.png',
-    nodding: '/sprites/grok_idle.png',
+    idle: 'sprites/grok_idle.png',
+    speaking: 'sprites/grok_speaking.png',
+    thinking: 'sprites/grok_casting.png',
+    casting: 'sprites/grok_casting.png',
+    nodding: 'sprites/grok_idle.png',
   },
 };
 
@@ -55,17 +58,21 @@ export const WizardCanvas = () => {
   const selectedProvider = useChatStore((state) => state.selectedProvider);
   const imagesRef = useRef<Record<string, HTMLImageElement>>({});
 
-  // Preload all provider assets; fall back to Gemini sprites if placeholder asset fails to load
+  // Preload all provider assets using import.meta.env.BASE_URL
   useEffect(() => {
     Object.entries(PROVIDER_SPRITE_MAPS).forEach(([provider, actionMap]) => {
       Object.entries(actionMap).forEach(([action, src]) => {
         const cacheKey = `${provider}_${action}`;
         const img = new Image();
-        img.src = src;
-        
+        img.src = getAssetUrl(src);
+
         img.onerror = () => {
-          // Automatic fallback to default Merlin sprites until new assets are placed in /public/sprites/
-          img.src = PROVIDER_SPRITE_MAPS.gemini[action as AvatarAction];
+          // Automatic fallback to default Merlin sprites
+          const fallbackPath = PROVIDER_SPRITE_MAPS.gemini[action as AvatarAction];
+          const fallbackUrl = getAssetUrl(fallbackPath);
+          if (img.src !== fallbackUrl) {
+            img.src = fallbackUrl;
+          }
         };
 
         imagesRef.current[cacheKey] = img;
