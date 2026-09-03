@@ -16,15 +16,15 @@ export default function App() {
   return (
     <div className="min-h-screen w-full bg-slate-950 flex items-center justify-center p-2 sm:p-4 text-white">
       <div className="snes-app-container flex flex-col p-2 gap-2 select-none overflow-hidden bg-black border-2 border-slate-800 shadow-2xl rounded-sm">
-        {/* Row 1: Header */}
+        {/* Row 1: Header Bar */}
         <TitleBar />
 
-        {/* Row 2: Wizard Avatar (Left) + JRPG Dialogue Box (Right) */}
+        {/* Row 2: Wizard Animation (Left) + JRPG Dialogue Text Box (Right) */}
         <div className="flex gap-2 h-44 sm:h-48 shrink-0">
           <div className="snes-box w-40 sm:w-48 shrink-0 p-2 flex items-center justify-center overflow-hidden bg-black">
             <WizardCanvas />
           </div>
-          <div className="flex-1 min-w-0 h-full flex flex-col overflow-hidden">
+          <div className="flex-1 min-w-0 h-full overflow-hidden">
             <JRPGDialogue />
           </div>
         </div>
@@ -33,10 +33,10 @@ export default function App() {
         <div className="snes-box flex-1 min-h-0 p-3 flex flex-col justify-between overflow-y-auto">
           <div>
             <div className="flex justify-between items-center mb-1">
-              <span className="text-yellow-300 font-bold tracking-wider">MERLIN</span>
+              <span className="text-yellow-300 font-bold tracking-wider text-xs">MERLIN STATUS</span>
               <QuitButton />
             </div>
-            <p className="text-gray-200 text-xs">STATUS: {avatarState.toUpperCase()}</p>
+            <p className="text-gray-200 text-xs">STATE: {avatarState.toUpperCase()}</p>
           </div>
           <HotkeySettings />
           <VolumeSlider />

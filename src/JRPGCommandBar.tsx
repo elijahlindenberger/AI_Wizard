@@ -8,7 +8,10 @@ export const JRPGCommandBar = () => {
   const clearSession = useChatStore((state) => state.clearSession);
 
   const handleCast = () => {
-    if (!input.trim()) return;
+    if (!input.trim()) {
+      soundFX.playFizzle();
+      return;
+    }
     sendMessage(input.trim());
     setInput('');
   };
@@ -37,7 +40,6 @@ export const JRPGCommandBar = () => {
         className="flex-1 bg-transparent text-white text-xs md:text-sm font-mono focus:outline-none placeholder-gray-500 pr-2"
       />
       
-      {/* Separated action buttons with clear gap spacing */}
       <div className="flex items-center gap-3 shrink-0">
         <button
           onClick={handleClear}

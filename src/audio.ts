@@ -4,6 +4,28 @@ export class RetroAudioEngine {
   private volume: number = 0.3;
   private isMuted: boolean = false;
 
+  constructor() {
+    this.setupAutoplayUnlock();
+  }
+
+  // Attaches one-time event listeners to resume suspended AudioContext on first user interaction
+  private setupAutoplayUnlock() {
+    const unlock = () => {
+      if (!this.ctx) {
+        this.init();
+      } else if (this.ctx.state === 'suspended') {
+        this.ctx.resume();
+      }
+      window.removeEventListener('pointerdown', unlock);
+      window.removeEventListener('keydown', unlock);
+      window.removeEventListener('touchstart', unlock);
+    };
+
+    window.addEventListener('pointerdown', unlock, { once: true });
+    window.addEventListener('keydown', unlock, { once: true });
+    window.addEventListener('touchstart', unlock, { once: true });
+  }
+
   private init() {
     if (!this.ctx) {
       const AudioCtx =
@@ -54,7 +76,7 @@ export class RetroAudioEngine {
   // Retro JRPG Sound Effects
   public playTextBeep() {
     this.init();
-    if (!this.ctx || !this.masterGain || this.isMuted) return;
+    if (!this.ctx || !this.masterGain || this.isMuted || this.ctx.state !== 'running') return;
 
     const osc = this.ctx.createOscillator();
     const gain = this.ctx.createGain();
@@ -78,7 +100,7 @@ export class RetroAudioEngine {
 
   public playSelect() {
     this.init();
-    if (!this.ctx || !this.masterGain || this.isMuted) return;
+    if (!this.ctx || !this.masterGain || this.isMuted || this.ctx.state !== 'running') return;
 
     const osc = this.ctx.createOscillator();
     const gain = this.ctx.createGain();
@@ -99,7 +121,7 @@ export class RetroAudioEngine {
 
   public playCast() {
     this.init();
-    if (!this.ctx || !this.masterGain || this.isMuted) return;
+    if (!this.ctx || !this.masterGain || this.isMuted || this.ctx.state !== 'running') return;
 
     const osc = this.ctx.createOscillator();
     const gain = this.ctx.createGain();
@@ -124,7 +146,7 @@ export class RetroAudioEngine {
 
   public playFizzle() {
     this.init();
-    if (!this.ctx || !this.masterGain || this.isMuted) return;
+    if (!this.ctx || !this.masterGain || this.isMuted || this.ctx.state !== 'running') return;
 
     const osc = this.ctx.createOscillator();
     const gain = this.ctx.createGain();

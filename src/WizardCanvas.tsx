@@ -72,12 +72,9 @@ export const WizardCanvas = () => {
         img.src = getAssetUrl(src);
 
         img.onerror = () => {
-          // Automatic fallback to default Merlin sprites
+          img.onerror = null; // Instantly breaks potential infinite error loops
           const fallbackPath = PROVIDER_SPRITE_MAPS.gemini[action as AvatarAction];
-          const fallbackUrl = getAssetUrl(fallbackPath);
-          if (img.src !== fallbackUrl) {
-            img.src = fallbackUrl;
-          }
+          img.src = getAssetUrl(fallbackPath);
         };
 
         imagesRef.current[cacheKey] = img;

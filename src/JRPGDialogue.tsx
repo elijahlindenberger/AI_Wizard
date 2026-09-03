@@ -11,35 +11,54 @@ const TypewriterText: React.FC<TypewriterProps> = ({ text, isLatest }) => {
   const [displayedText, setDisplayedText] = useState(isLatest ? '' : text);
   const setAvatarState = useChatStore((state) => state.setAvatarState);
   const indexRef = useRef(0);
+  const textRef = useRef(text);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
+    textRef.current = text;
     if (!isLatest) {
       setDisplayedText(text);
       return;
     }
 
-    // Switch avatar state to speaking while typing text
-    if (text.length > 0 && indexRef.current < text.length) {
-      setAvatarState('speaking');
-    }
+    const startTypingLoop = () => {
+      if (timerRef.current !== null) return;
 
-    const timer = setInterval(() => {
-      if (indexRef.current < text.length) {
-        indexRef.current += 1;
-        const nextIndex = indexRef.current;
-        setDisplayedText(text.slice(0, nextIndex));
+      timerRef.current = setInterval(() => {
+        const currentText = textRef.current;
 
-        if (nextIndex % 2 === 0) {
-          soundFX.playBlip();
+        if (indexRef.current < currentText.length) {
+          setAvatarState('speaking');
+          indexRef.current += 1;
+          const nextIndex = indexRef.current;
+          setDisplayedText(currentText.slice(0, nextIndex));
+
+          if (nextIndex % 2 === 0) {
+            soundFX.playBlip();
+          }
+        } else if (currentText.length > 0 && indexRef.current >= currentText.length) {
+          // Finish typing current stream buffer and stop background ticks
+          setAvatarState('idle');
+          if (timerRef.current !== null) {
+            clearInterval(timerRef.current);
+            timerRef.current = null;
+          }
         }
-      } else if (text.length > 0 && indexRef.current >= text.length) {
-        // Return to idle state when dialogue finishes typing
-        setAvatarState('idle');
-      }
-    }, 18);
+      }, 18);
+    };
 
-    return () => clearInterval(timer);
+    if (indexRef.current < text.length) {
+      startTypingLoop();
+    }
   }, [text, isLatest, setAvatarState]);
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current !== null) {
+        clearInterval(timerRef.current);
+      }
+    };
+  }, []);
 
   return <span>{displayedText}</span>;
 };

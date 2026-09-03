@@ -1,10 +1,11 @@
 @import "tailwindcss";
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
+/* Dynamic Viewport Height prevents soft-keyboard layout squeezing */
 .snes-app-container {
   width: 100%;
   max-width: 800px;
-  height: min(600px, 95vh);
+  height: min(600px, 95dvh);
   margin: 0 auto;
 }
 
