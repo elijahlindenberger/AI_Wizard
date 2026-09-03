@@ -16,20 +16,20 @@ export default function App() {
   return (
     <div className="min-h-screen w-full bg-slate-950 flex items-center justify-center p-2 sm:p-4 text-white">
       <div className="snes-app-container flex flex-col p-2 gap-2 select-none overflow-hidden bg-black border-2 border-slate-800 shadow-2xl rounded-sm">
-        {/* Top Header Bar */}
+        {/* Row 1: Header */}
         <TitleBar />
 
-        {/* Top Row: Wizard Animation (Left) + JRPG Dialogue Text (Right) */}
-        <div className="flex gap-2 h-48 shrink-0">
-          <div className="snes-box w-48 shrink-0 p-2 flex items-center justify-center overflow-hidden bg-black">
+        {/* Row 2: Wizard Avatar (Left) + JRPG Dialogue Box (Right) */}
+        <div className="flex gap-2 h-44 sm:h-48 shrink-0">
+          <div className="snes-box w-40 sm:w-48 shrink-0 p-2 flex items-center justify-center overflow-hidden bg-black">
             <WizardCanvas />
           </div>
-          <div className="snes-box flex-1 min-w-0 p-3 flex flex-col overflow-hidden">
+          <div className="flex-1 min-w-0 h-full flex flex-col overflow-hidden">
             <JRPGDialogue />
           </div>
         </div>
 
-        {/* Middle Row: Status & Audio Controls */}
+        {/* Row 3: Status Details & Controls */}
         <div className="snes-box flex-1 min-h-0 p-3 flex flex-col justify-between overflow-y-auto">
           <div>
             <div className="flex justify-between items-center mb-1">
@@ -42,7 +42,7 @@ export default function App() {
           <VolumeSlider />
         </div>
 
-        {/* Bottom Row: Command Input Bar */}
+        {/* Row 4: Command Input Bar */}
         <div className="shrink-0">
           <JRPGCommandBar />
         </div>
