@@ -119,25 +119,35 @@ export class RetroAudioEngine {
     osc.stop(this.ctx.currentTime + 0.12);
   }
 
+  // Magical SNES Spell Casting Arpeggio (C5 -> E5 -> G5 -> B5 -> C6 -> E6)
   public playCast() {
     this.init();
     if (!this.ctx || !this.masterGain || this.isMuted || this.ctx.state !== 'running') return;
 
-    const osc = this.ctx.createOscillator();
-    const gain = this.ctx.createGain();
+    const now = this.ctx.currentTime;
+    const frequencies = [523.25, 659.25, 783.99, 987.77, 1046.50, 1318.51];
 
-    osc.type = 'sawtooth';
-    osc.frequency.setValueAtTime(200, this.ctx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(800, this.ctx.currentTime + 0.3);
+    frequencies.forEach((freq, index) => {
+      if (!this.ctx || !this.masterGain) return;
 
-    gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.35);
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
 
-    osc.connect(gain);
-    gain.connect(this.masterGain);
+      osc.type = 'triangle';
+      const noteStart = now + index * 0.04;
+      const noteEnd = noteStart + 0.18;
 
-    osc.start();
-    osc.stop(this.ctx.currentTime + 0.35);
+      osc.frequency.setValueAtTime(freq, noteStart);
+
+      gain.gain.setValueAtTime(0.12, noteStart);
+      gain.gain.exponentialRampToValueAtTime(0.001, noteEnd);
+
+      osc.connect(gain);
+      gain.connect(this.masterGain);
+
+      osc.start(noteStart);
+      osc.stop(noteEnd);
+    });
   }
 
   public playSpellCast() {
