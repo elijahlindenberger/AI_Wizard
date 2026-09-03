@@ -60,20 +60,20 @@ export const SettingsModal = () => {
         {/* Provider Selector Grid */}
         <div className="flex flex-col gap-3 text-xs">
           <label className="text-gray-300 font-bold">SELECT PROVIDER:</label>
-          <div className="grid grid-cols-2 gap-3">
+
+          <div className="snes-provider-grid">
             {(['gemini', 'openai', 'claude', 'grok'] as LLMProvider[]).map((provider) => {
               const isSelected = selectedProvider === provider;
               return (
                 <button
                   key={provider}
+                  type="button"
                   onClick={() => {
                     soundFX.playSelect();
                     setSelectedProvider(provider);
                   }}
-                  className={`p-2.5 uppercase border text-center transition-all cursor-pointer font-bold text-[10px] sm:text-xs block ${
-                    isSelected
-                      ? 'bg-blue-900 border-white text-white shadow-md'
-                      : 'bg-black/60 border-slate-700 text-slate-500 hover:text-slate-300 hover:border-slate-500'
+                  className={`snes-provider-btn ${
+                    isSelected ? 'snes-provider-btn-active' : 'snes-provider-btn-inactive'
                   }`}
                 >
                   {PROVIDER_LABELS[provider]}
