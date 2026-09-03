@@ -1,19 +1,11 @@
 @import "tailwindcss";
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
-/* Fluid Retro App Container */
 .snes-app-container {
   width: 100%;
   max-width: 800px;
   height: min(600px, 95vh);
   margin: 0 auto;
-}
-
-/* Aspect-ratio locked Wizard Portrait Box */
-.snes-wizard-box {
-  width: 100% !important;
-  aspect-ratio: 1 / 1;
-  flex-shrink: 0;
 }
 
 .snes-box {
