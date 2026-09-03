@@ -1,6 +1,28 @@
 @import "tailwindcss";
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
+/* Fluid Retro App Container (Adapts to mobile screens while capping at 800x600) */
+.snes-app-container {
+  width: 100%;
+  max-width: 800px;
+  height: min(600px, 95vh);
+  margin: 0 auto;
+}
+
+/* Responsive Wizard Portrait Box (Scales down on mobile to preserve vertical space) */
+.snes-wizard-box {
+  width: 140px !important;
+  height: 140px !important;
+  flex-shrink: 0;
+}
+
+@media (min-width: 640px) {
+  .snes-wizard-box {
+    width: 200px !important;
+    height: 200px !important;
+  }
+}
+
 .snes-box {
   background: linear-gradient(180deg, #0000aa 0%, #000033 100%);
   border: 4px solid #ffffff;
@@ -8,19 +30,17 @@
   box-shadow: inset 0 0 0 2px #888888;
   font-family: 'Press Start 2P', monospace;
   image-rendering: pixelated;
-  color: #ffffff; /* Guarantees high-contrast white text */
+  color: #ffffff !important;
 }
 
-/* Force all buttons, inputs, text, and nested tags inside snes-box to render white */
 .snes-box *,
 .snes-box input,
 .snes-box button,
 .snes-box textarea {
-  color: #ffffff;
+  color: #ffffff !important;
   font-family: 'Press Start 2P', monospace;
 }
 
-/* Add drop shadows to paragraph text for classic SNES readability */
 .snes-box p,
 .snes-box span {
   text-shadow: 1px 1px 0px #000000;
