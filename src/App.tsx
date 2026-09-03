@@ -14,15 +14,14 @@ export default function App() {
   const avatarState = useChatStore((state) => state.avatarState);
 
   return (
-    // Outer wrapper: Fills screen, centers window vertically and horizontally
     <div className="min-h-screen w-full bg-slate-950 flex items-center justify-center p-2 sm:p-4 text-white">
-      
-      {/* Inner container: Fixed 600px height prevents vertical layout stretching */}
-      <div className="w-full max-w-3xl h-[600px] flex flex-col p-2 gap-2 select-none overflow-hidden bg-black border-2 border-slate-800 shadow-2xl rounded-sm">
+      {/* Locked 4:3 SNES container class */}
+      <div className="snes-app-container flex flex-col p-2 gap-2 select-none overflow-hidden bg-black border-2 border-slate-800 shadow-2xl rounded-sm">
         <TitleBar />
         <div className="flex-1 flex flex-col gap-2 min-h-0">
-          <div className="flex gap-2 h-48 shrink-0">
-            <div className="snes-box p-2 flex items-center justify-center w-48 shrink-0 overflow-hidden bg-black">
+          <div className="flex gap-2 h-52 shrink-0">
+            {/* Fixed 200x200 portrait box class */}
+            <div className="snes-box snes-wizard-box p-2 flex items-center justify-center overflow-hidden bg-black">
               <WizardCanvas />
             </div>
             <div className="snes-box p-3 flex-1 text-white text-xs md:text-sm flex flex-col justify-between overflow-y-auto">
@@ -45,7 +44,6 @@ export default function App() {
           </div>
         </div>
 
-        {/* Global Settings Modal */}
         <SettingsModal />
       </div>
     </div>

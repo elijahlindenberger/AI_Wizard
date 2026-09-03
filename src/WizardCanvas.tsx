@@ -1,8 +1,13 @@
 import React, { useEffect, useRef } from 'react';
 import { useChatStore, AvatarAction, LLMProvider } from './useChatStore';
 
-// Helper to prepend Vite's base path for GitHub Pages compatibility
-const getAssetUrl = (path: string) => `${import.meta.env.BASE_URL}${path.replace(/^\//, '')}`;
+// Helper to prepend Vite's base path cleanly without double slashes
+const getAssetUrl = (path: string) => {
+  const baseUrl = import.meta.env.BASE_URL || '/';
+  const cleanBase = baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`;
+  const cleanPath = path.startsWith('/') ? path.slice(1) : path;
+  return `${cleanBase}${cleanPath}`;
+};
 
 // Sprite sheets for each LLM provider across idle, speaking, and casting states
 const PROVIDER_SPRITE_MAPS: Record<LLMProvider, Record<AvatarAction, string>> = {
@@ -58,7 +63,7 @@ export const WizardCanvas = () => {
   const selectedProvider = useChatStore((state) => state.selectedProvider);
   const imagesRef = useRef<Record<string, HTMLImageElement>>({});
 
-  // Preload all provider assets using import.meta.env.BASE_URL
+  // Preload all provider assets using getAssetUrl
   useEffect(() => {
     Object.entries(PROVIDER_SPRITE_MAPS).forEach(([provider, actionMap]) => {
       Object.entries(actionMap).forEach(([action, src]) => {
